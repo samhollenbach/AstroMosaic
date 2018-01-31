@@ -46,44 +46,43 @@ def centerPos(objList):
     return (x, y)
 
 # Degree positions of objects to look at
-heart_pos = (RAtoDeg(2, 32.8, 0), DECtoDeg(61, 27, 0))
+heart_pos = (RAtoDeg(2, 33, 22), DECtoDeg(61, 26, 36))
 soul_pos = (RAtoDeg(2, 51.4, 0), DECtoDeg(60, 25, 0))
 
 # Center position of
-center = centerPos([heart_pos, soul_pos])
+center = centerPos([heart_pos])
 
 # Size of image being taken
 image_width = ArcMintoDeg(29, 0)
 image_height = ArcMintoDeg(19, 0)
 
 # Amount of area on the sky to cover
-cover_width = 5.5
-cover_height = 3.9
+cover_width = ArcMintoDeg(150,0)
+cover_height = ArcMintoDeg(150,0)
 
 # Degrees of overlap on edges of each picture
-edge_overlap = ArcMintoDeg(0, 1)
+edge_overlap_x = ArcMintoDeg(7, 0)
+edge_overlap_y = ArcMintoDeg(5, 0)
 
 # Start and end X/Y positions for camera center position
-boundariesX = (center[0] - (cover_width / 2) - edge_overlap + (image_width / 2),
-               center[0] + (cover_width / 2) + edge_overlap - (image_width / 2))
-boundariesY = (center[1] - cover_height / 2 - edge_overlap + image_height / 2,
-               center[1] + cover_height / 2 + edge_overlap - image_height / 2)
+boundariesX = (center[0] - (cover_width / 2) - edge_overlap_x + (image_width / 2),
+               center[0] + (cover_width / 2) + edge_overlap_x - (image_width / 2))
+boundariesY = (center[1] - cover_height / 2 - edge_overlap_y + image_height / 2,
+               center[1] + cover_height / 2 + edge_overlap_y - image_height / 2)
 print("Finding camera positions...\n")
 final_positions = []
 currentX = boundariesX[0]
-print(boundariesX)
 while currentX < boundariesX[1]:
     currentY = boundariesY[0]
     x_row = []
-    print(DegToRA(currentX))
     while currentY < boundariesY[1]:
 
         currentPosition = (DegToRA(currentX), DegToDEC(currentY))
         x_row.append(currentPosition)
 
-        currentY += image_width/2 - edge_overlap
+        currentY += image_width/2 - edge_overlap_y
     final_positions.append(x_row)
-    currentX += image_width/2 - edge_overlap
+    currentX += image_width/2 - edge_overlap_x
 
 print("Calculated {} positions\n".format(len(final_positions)*len(final_positions[0])))
 
