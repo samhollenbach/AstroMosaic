@@ -1,5 +1,5 @@
 import csv
-
+import math
 # EVERYTHING IN DEGREES
 
 # Convert Right Ascension to degrees
@@ -14,6 +14,22 @@ def ArcMintoDeg(min, sec):
 def DECtoDeg(deg, min, sec):
     return deg + ((min / 60) + (sec / 3600))
 
+def DegToRA(deg):
+    hr = math.floor(deg/15)
+    deg -= 15*hr
+    min = math.floor(deg/(15/60))
+    deg -= (15/60)*min
+    sec = math.floor(deg/(15/3600))
+    return (hr, min, sec)
+
+def DegToDEC(deg):
+    degrees = math.floor(deg)
+    deg -= degrees
+    min = math.floor(deg*60)
+    deg -= (min/60)
+    sec = math.floor(deg*3600)
+    return  (degrees, min, sec)
+
 # Takes in list of position tuples [(x1, y1), (x2, y2), ...]
 def centerPos(objList):
     x = 0
@@ -27,7 +43,7 @@ def centerPos(objList):
     x /= s
     y /= s
     print("Found the center of {} objects at ({}, {}) degrees\n".format(s, round(x,2), round(y,2)))
-    return (x/s, y/s)
+    return (x, y)
 
 # Degree positions of objects to look at
 heart_pos = (RAtoDeg(2, 32.8, 0), DECtoDeg(61, 27, 0))
@@ -55,11 +71,14 @@ boundariesY = (center[1] - cover_height / 2 - edge_overlap + image_height / 2,
 print("Finding camera positions...\n")
 final_positions = []
 currentX = boundariesX[0]
+print(boundariesX)
 while currentX < boundariesX[1]:
     currentY = boundariesY[0]
     x_row = []
+    print(DegToRA(currentX))
     while currentY < boundariesY[1]:
-        currentPosition = (round(currentX, 2), round(currentY,2))
+
+        currentPosition = (DegToRA(currentX), DegToDEC(currentY))
         x_row.append(currentPosition)
 
         currentY += image_width/2 - edge_overlap
