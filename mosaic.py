@@ -50,15 +50,15 @@ heart_pos = (RAtoDeg(2, 33, 22), DECtoDeg(61, 26, 36))
 soul_pos = (RAtoDeg(2, 51.4, 0), DECtoDeg(60, 25, 0))
 
 # Center position of
-center = centerPos([heart_pos])
+center = centerPos([heart_pos, soul_pos])
 
 # Size of image being taken
 image_width = ArcMintoDeg(29, 0)
 image_height = ArcMintoDeg(19, 0)
 
 # Amount of area on the sky to cover
-cover_width = ArcMintoDeg(150,0)
-cover_height = ArcMintoDeg(150,0)
+cover_width = 5.5
+cover_height = 3.9
 
 # Degrees of overlap on edges of each picture
 edge_overlap_x = ArcMintoDeg(7, 0)
@@ -80,9 +80,9 @@ while currentX < boundariesX[1]:
         currentPosition = (DegToRA(currentX), DegToDEC(currentY))
         x_row.append(currentPosition)
 
-        currentY += image_width/2 - edge_overlap_y
+        currentY += image_height - edge_overlap_y
     final_positions.append(x_row)
-    currentX += image_width/2 - edge_overlap_x
+    currentX += image_width - edge_overlap_x
 
 print("Calculated {} positions\n".format(len(final_positions)*len(final_positions[0])))
 
