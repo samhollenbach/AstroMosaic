@@ -57,8 +57,8 @@ def centerPos(objList):
 heart_pos = (RAtoDeg(2, 33, 22), DECtoDeg(61, 26, 36))
 soul_pos = (RAtoDeg(2, 51.4, 0), DECtoDeg(60, 25, 0))
 
-# Center position of
-#center = centerPos([heart_pos, soul_pos])
+# Center position of listen objects
+# center = centerPos([heart_pos, soul_pos])
 center = centerPos([heart_pos])
 
 # Size of image being taken
