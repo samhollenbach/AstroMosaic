@@ -58,16 +58,18 @@ heart_pos = (RAtoDeg(2, 33, 22), DECtoDeg(61, 26, 36))
 soul_pos = (RAtoDeg(2, 51.4, 0), DECtoDeg(60, 25, 0))
 
 # Center position of
-center = centerPos([heart_pos, soul_pos])
+#center = centerPos([heart_pos, soul_pos])
+center = centerPos([heart_pos])
 
 # Size of image being taken
 image_width = ArcMintoDeg(29, 0)
 image_height = ArcMintoDeg(19, 0)
 
 # Amount of area on the sky to cover
-cover_width_degrees = 5.5
-cover_width = math.sqrt((cover_width_degrees ** 2) * (math.cos(center[1]) ** 2))
-cover_height = 3.9
+cover_width_degrees = ArcMintoDeg(100, 0)
+cover_height = ArcMintoDeg(100, 0)
+
+cover_width = math.sqrt((cover_width_degrees ** 2) * (math.cos(math.radians(center[1])) ** 2))
 
 # Degrees of overlap on edges of each picture
 edge_overlap_x = ArcMintoDeg(7, 0)
