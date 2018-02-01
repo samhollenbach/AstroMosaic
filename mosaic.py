@@ -1,34 +1,41 @@
 import csv
 import math
+
+
 # EVERYTHING IN DEGREES
 
 # Convert Right Ascension to degrees
 def RAtoDeg(hr, min, sec):
-    return 15 * (hr + (min / 60) + (sec / 3600))
+    return 15 * (hr + (min / 60.) + (sec / 3600.))
+
 
 # Convert arcmin/arcsec to degrees
 def ArcMintoDeg(min, sec):
-    return min/60 + sec/3600
+    return min / 60. + sec / 3600.
+
 
 # Convert Declination to degrees
 def DECtoDeg(deg, min, sec):
-    return deg + ((min / 60) + (sec / 3600))
+    return deg + ((min / 60) + (sec / 3600.))
+
 
 def DegToRA(deg):
-    hr = math.floor(deg/15)
-    deg -= 15*hr
-    min = math.floor(deg/(15/60))
-    deg -= (15/60)*min
-    sec = math.floor(deg/(15/3600))
+    hr = math.floor(deg / 15.)
+    deg -= 15 * hr
+    min = math.floor(deg / (15 / 60.))
+    deg -= (15 / 60) * min
+    sec = math.floor(deg / (15 / 3600.))
     return (hr, min, sec)
+
 
 def DegToDEC(deg):
     degrees = math.floor(deg)
     deg -= degrees
-    min = math.floor(deg*60)
-    deg -= (min/60)
-    sec = math.floor(deg*3600)
-    return  (degrees, min, sec)
+    min = math.floor(deg * 60)
+    deg -= (min / 60.)
+    sec = math.floor(deg * 3600)
+    return (degrees, min, sec)
+
 
 # Takes in list of position tuples [(x1, y1), (x2, y2), ...]
 def centerPos(objList):
@@ -37,13 +44,14 @@ def centerPos(objList):
     s = len(objList)
     print("Objects at: ")
     for l in objList:
-        print("({}, {}) ".format(round(l[0],2), round(l[1],2)))
+        print("({}, {}) ".format(round(l[0], 2), round(l[1], 2)))
         x += l[0]
         y += l[1]
     x /= s
     y /= s
-    print("Found the center of {} objects at ({}, {}) degrees\n".format(s, round(x,2), round(y,2)))
+    print("Found the center of {} objects at ({}, {}) degrees\n".format(s, round(x, 2), round(y, 2)))
     return (x, y)
+
 
 # Degree positions of objects to look at
 heart_pos = (RAtoDeg(2, 33, 22), DECtoDeg(61, 26, 36))
@@ -57,7 +65,8 @@ image_width = ArcMintoDeg(29, 0)
 image_height = ArcMintoDeg(19, 0)
 
 # Amount of area on the sky to cover
-cover_width = 5.5
+cover_width_degrees = 5.5
+cover_width = math.sqrt((cover_width_degrees ** 2) * (math.cos(center[1]) ** 2))
 cover_height = 3.9
 
 # Degrees of overlap on edges of each picture
@@ -76,7 +85,6 @@ while currentX < boundariesX[1]:
     currentY = boundariesY[0]
     x_row = []
     while currentY < boundariesY[1]:
-
         currentPosition = (DegToRA(currentX), DegToDEC(currentY))
         x_row.append(currentPosition)
 
@@ -84,7 +92,7 @@ while currentX < boundariesX[1]:
     final_positions.append(x_row)
     currentX += image_width - edge_overlap_x
 
-print("Calculated {} positions\n".format(len(final_positions)*len(final_positions[0])))
+print("Calculated {} positions\n".format(len(final_positions) * len(final_positions[0])))
 
 # Name of .csv file to store position data
 outfile = "pointing_positions.csv"
