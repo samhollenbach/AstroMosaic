@@ -66,8 +66,8 @@ image_width = ArcMintoDeg(29, 0)
 image_height = ArcMintoDeg(19, 0)
 
 # Amount of area on the sky to cover
-cover_width_degrees = ArcMintoDeg(100, 0)
-cover_height = ArcMintoDeg(100, 0)
+cover_width_degrees = ArcMintoDeg(120, 0)
+cover_height = ArcMintoDeg(120, 0)
 
 cover_width = math.sqrt((cover_width_degrees ** 2) * (math.cos(math.radians(center[1])) ** 2))
 
