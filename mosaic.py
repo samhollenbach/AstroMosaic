@@ -31,9 +31,9 @@ def DegToRA(deg):
 def DegToDEC(deg):
     degrees = math.floor(deg)
     deg -= degrees
-    min = math.floor(deg * 60)
+    min = math.floor(deg * 60.)
     deg -= (min / 60.)
-    sec = math.floor(deg * 3600)
+    sec = math.floor(deg * 3600.)
     return (degrees, min, sec)
 
 
@@ -55,7 +55,7 @@ def centerPos(objList):
 
 # Degree positions of objects to look at
 heart_pos = (RAtoDeg(2, 33, 22), DECtoDeg(61, 26, 36))
-soul_pos = (RAtoDeg(2, 51.4, 0), DECtoDeg(60, 25, 0))
+#soul_pos = (RAtoDeg(2, 51.4, 0), DECtoDeg(60, 25, 0))
 
 # Center position of listen objects
 # center = centerPos([heart_pos, soul_pos])
@@ -66,8 +66,8 @@ image_width = ArcMintoDeg(29, 0)
 image_height = ArcMintoDeg(19, 0)
 
 # Amount of area on the sky to cover
-cover_width_degrees = ArcMintoDeg(120, 0)
-cover_height = ArcMintoDeg(120, 0)
+cover_width_degrees = ArcMintoDeg(100, 0)
+cover_height = ArcMintoDeg(100, 0)
 
 cover_width = math.sqrt((cover_width_degrees ** 2) * (math.cos(math.radians(center[1])) ** 2))
 

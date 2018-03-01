@@ -2,21 +2,42 @@ import csv
 
 darkFrames = 5
 waitTime = 30
-positions = ["10h 02m 07.674s +68d 41m 27.98s"]
+positions = []
 objects = []
-exposureTimes = [120]
+exposureTimes = [5, 20]
+filterTimes = {"R": [5], "Ha": [20], "OIII": [20]}
 imageNumber = 2
-filters = ["R", "Ha"]
+filters = ["R", "Ha", "OIII"]
 
 commands_output = []
 dark_commands_output = []
 
 
+image_counter = 0
+time_counter = 0
+
+
+def read_pointings(regfile):
+    with open(regfile, "r") as w:
+        reader = csv.reader(w, delimiter=" ")
+        for r in reader:
+            ra = r[0]
+            dec = r[1]
+            ra_split = ra.split(":")
+            dec_split = dec.split(":")
+            coord = "{}h {}m {}s {}d {}m {}s".format(ra_split[0],ra_split[1],ra_split[2],dec_split[0],dec_split[1],dec_split[2])
+            positions.append(coord)
+
 def make_dark_commands():
     dark_commands_output.append(["SetFrameMode", "Dark", ""])
+    dark_frame_num = 0
+    dark_time = 0
     for e in exposureTimes:
+        dark_frame_num += darkFrames
+        dark_time += e * darkFrames
         for _ in range(0, darkFrames):
             dark_commands_output.append(["TakeImage", e, "\tdark frame"])
+    print("Dark frames script will take {} dark frames, totalling {} seconds of exposure time".format(dark_frame_num, dark_time))
 
 
 def add_command(command, param, comment=""):
@@ -24,6 +45,10 @@ def add_command(command, param, comment=""):
 
 
 def take_image_command(exposure, comment=""):
+    global image_counter
+    global time_counter
+    image_counter += 1
+    time_counter += exposure
     add_command("TakeImage", exposure, comment)
 
 
@@ -38,8 +63,8 @@ def run_all_positions():
                 add_command("SetFrameMode", "Light")
                 frame_mode_light = True
             add_command("SetFilter", f)
-
-            for e in exposureTimes:
+            exp_times = filterTimes[f]
+            for e in exp_times:
                 for _ in range(0, imageNumber):
                     take_image_command(e)
 
@@ -52,9 +77,13 @@ def make_command_file(commands, filename="orch_commands.txt"):
 
 
 # Makes normal script for all positions/filters/exposures
+
+read_pointings("pointings_XY.reg")
 run_all_positions()
 make_command_file(commands_output)
+print("Script contains {} imaging commands, totalling {} seconds of exposure time\n".format(image_counter, time_counter))
+
 
 # Makes script for dark frames only depending on exposures
-# make_dark_commands()
-# make_command_file(dark_commands_output, "dark_frames.txt")
+make_dark_commands()
+make_command_file(dark_commands_output, "dark_frames.txt")
