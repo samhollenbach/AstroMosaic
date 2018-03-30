@@ -4,10 +4,10 @@ darkFrames = 5
 waitTime = 30
 positions = []
 objects = []
-exposureTimes = [5, 20]
-filterTimes = {"R": [5], "Ha": [20], "OIII": [20]}
-imageNumber = 2
-filters = ["R", "Ha", "OIII"]
+exposureTimes = [60, 120]
+filterTimes = {"R": [60], "Ha": [120], "I": [60]}
+imageNumber = 1
+filters = ["Ha", "I", "R"]
 
 commands_output = []
 dark_commands_output = []
@@ -53,10 +53,12 @@ def take_image_command(exposure, comment=""):
 
 
 def run_all_positions():
+    global time_counter
     frame_mode_light = False
     for p in positions:
         add_command("SlewToRaDec", p)
-        add_command("WaitFor", 30)
+        add_command("WaitFor", 1)
+        time_counter += 1
 
         for f in filters:
             if not frame_mode_light:
@@ -78,10 +80,10 @@ def make_command_file(commands, filename="orch_commands.txt"):
 
 # Makes normal script for all positions/filters/exposures
 
-read_pointings("pointings_XY.reg")
+read_pointings("pointings_trimmed.reg")
 run_all_positions()
 make_command_file(commands_output)
-print("Script contains {} imaging commands, totalling {} seconds of exposure time\n".format(image_counter, time_counter))
+print("Script contains {} imaging commands, totalling {} ({} minutes) seconds of exposure time\n".format(image_counter, time_counter, time_counter/60))
 
 
 # Makes script for dark frames only depending on exposures
