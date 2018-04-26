@@ -1,10 +1,10 @@
 import csv
 
-darkFrames = 5
+darkFrames = 3
 waitTime = 30
 positions = []
 objects = []
-exposureTimes = [60, 120]
+exposureTimes = [.04, .05, .5, 1, 60, 120]
 filterTimes = {"R": [60], "Ha": [120], "I": [60]}
 imageNumber = 1
 filters = ["Ha", "I", "R"]
@@ -64,6 +64,8 @@ def run_all_positions():
             if not frame_mode_light:
                 add_command("SetFrameMode", "Light")
                 frame_mode_light = True
+
+
             add_command("SetFilter", f)
             exp_times = filterTimes[f]
             for e in exp_times:
@@ -80,10 +82,10 @@ def make_command_file(commands, filename="orch_commands.txt"):
 
 # Makes normal script for all positions/filters/exposures
 
-read_pointings("pointings_trimmed.reg")
-run_all_positions()
-make_command_file(commands_output)
-print("Script contains {} imaging commands, totalling {} ({} minutes) seconds of exposure time\n".format(image_counter, time_counter, time_counter/60))
+#read_pointings("pointings_trimmed.reg")
+#run_all_positions()
+#make_command_file(commands_output)
+#print("Script contains {} imaging commands, totalling {} ({} minutes) seconds of exposure time\n".format(image_counter, time_counter, time_counter/60))
 
 
 # Makes script for dark frames only depending on exposures
