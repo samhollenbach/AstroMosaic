@@ -74,14 +74,19 @@ def compare_files(ref_coo, match_coo):
 
 def make_shift_cmd(ref, match, shift):
     print(ref, match, shift)
-
     return
 
 def find_matching_pointings(directory):
-    onlyfiles = [f for f in listdir(directory) if isfile(join(directory, f))][1:]
-    print(onlyfiles)
+    #onlyfiles = [f for f in listdir(directory) if isfile(join(directory, f))][1:]
+    #print(onlyfiles)
+    files = ["R_Hollenbach.00000595.02h28m53.2s_62d03m58sN.fits.coo.1", "Ha_Hollenbach.00000594.02h28m53.4s_62d03m58sN.fits.coo.1"]
+    ref = files[0]
 
-
+    ra = re.search('.{2}h.{2}m.{4}s',ref)
+    dec = re.search('.{2}d.{2}m.{2}s',ref)
+    ra_fixed = re.sub('\..{1}s', 's', ra.group(0))
+    print(ra.group(0), ra_fixed)
+    print(dec.group(0))
     return
 
 
@@ -89,6 +94,6 @@ def find_matching_pointings(directory):
 ref_prefix = "R"
 main_path = "/Users/research/Desktop/PROJECT/IMAGES"
 centers_path = "{}/imshift/centers".format(main_path)
-compare_files("{}/R_Hollenbach.00000595.02h28m53.2s_62d03m58sN.fits.coo.1".format(centers_path), "{}/Ha_Hollenbach.00000594.02h28m53.4s_62d03m58sN.fits.coo.1".format(centers_path))
+#compare_files("{}/R_Hollenbach.00000595.02h28m53.2s_62d03m58sN.fits.coo.1".format(centers_path), "{}/Ha_Hollenbach.00000594.02h28m53.4s_62d03m58sN.fits.coo.1".format(centers_path))
 
 find_matching_pointings(centers_path)
