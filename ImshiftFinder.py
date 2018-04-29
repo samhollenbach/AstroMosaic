@@ -16,7 +16,6 @@ def compare_files(ref_coo, match_coo):
                     continue
                 ref_list.append(r)
 
-
             match_reader = csv.reader(m_coo, delimiter=" ")
             match_list = []
             for m in match_reader:
@@ -88,8 +87,7 @@ def find_matching_pointings(directory, pics_path, ref_prefix):
                 _, _, x, y = compare_files("{}/{}".format(directory,ref), "{}/{}".format(directory,match))
                 final_matches.append((ref, match, x, y))
 
-
-    with open("/Users/research/Desktop/PROJECT/IMAGES/imshift/shifts.cl", 'w') as w:
+    with open("{}/imshift/shifts.cl".format(directory), 'w') as w:
         for m in final_matches:
             cmd = "imshift {}/{} {}/shifted_{} {} {}\n".format(pics_path, m[1][:-6], pics_path, m[1][:-6], m[2], m[3])
             w.write(cmd)
@@ -101,7 +99,6 @@ def get_ra_dec(file_name):
     ra = re.sub('\..s', 's', ra_re.group(0))
     dec = re.search('.{2}d.{2}m', file_name).group(0)
     return ra, dec
-
 
 
 ref_prefix = "R"
