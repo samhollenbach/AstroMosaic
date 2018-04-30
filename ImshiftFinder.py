@@ -5,7 +5,7 @@ from os import listdir
 from os.path import isfile, join
 
 def compare_files(ref_coo, match_coo):
-    SHIFT_THRESHOLD = 20
+    SHIFT_THRESHOLD = 100
     with open(ref_coo, 'r') as r_coo:
         with open(match_coo,'r') as m_coo:
             ref_reader = csv.reader(r_coo, delimiter=" ")
@@ -65,8 +65,11 @@ def compare_files(ref_coo, match_coo):
             return ref_coo, match_coo, avg_x, avg_y
 
 
-def find_matching_pointings(directory, pics_path, ref_prefix):
-    files = [f for f in listdir(directory) if isfile(join(directory, f))][1:]
+def find_matching_pointings(centers_path, pics_path, out_path, ref_prefix, shift_all=False):
+    ARCMIN_THRESH = 1.5
+    files = [f for f in listdir(centers_path) if isfile(join(centers_path, f))][1:]
+    files = [f for f in files if ".fits.coo" in f]
+
     ref_files = []
     match_files = []
     final_matches = []
@@ -76,28 +79,64 @@ def find_matching_pointings(directory, pics_path, ref_prefix):
         else:
             match_files.append(f)
 
-    for ref in ref_files:
+    if len(ref_files) < 1:
+        print("No reference files found, check ref_prefix parameter")
+        return
+    if len(match_files) < 1:
+        print("No match files found")
+    if shift_all and len(ref_files) > 1:
+        print("Cannot shift all images in folder to more than one reference image "
+              "(Check shift_all and ref_prefix parameters)")
+        return
 
-        ra, dec = get_ra_dec(ref)
+    counter = 0
 
+    if shift_all:
+        ref = ref_files[0]
         for match in match_files:
-            ra_match, dec_match = get_ra_dec(match)
-            if ra == ra_match and dec == dec_match:
-                print(ref, match)
-                _, _, x, y = compare_files("{}/{}".format(directory,ref), "{}/{}".format(directory,match))
-                final_matches.append((ref, match, x, y))
+            _, _, x, y = compare_files("{}/{}".format(centers_path, ref), "{}/{}".format(centers_path, match))
+            final_matches.append((ref, match, x, y))
+        counter = len(match_files)
+    else:
+        for ref in ref_files:
+            ra, dec = get_ra_dec(ref, True, False)
+            ra = ra.split(' ')
+            dec = dec.split(' ')
+            for match in match_files:
+                ra_match, dec_match = get_ra_dec(match, True, False)
+                ra_match = ra_match.split(' ')
+                dec_match = dec_match.split(' ')
+                ra_dif = abs(int(ra[1]) - int(ra_match[1]) + (int(ra[2]) - int(ra_match[2])) / 60.)
+                dec_dif = abs(int(dec[1]) - int(dec_match[1]) + (int(dec[2]) - int(dec_match[2])) / 60.)
+                if ra_dif <= ARCMIN_THRESH and dec_dif <= ARCMIN_THRESH:
+                    _, _, x, y = compare_files("{}/{}".format(centers_path, ref), "{}/{}".format(centers_path, match))
+                    final_matches.append((ref, match, x, y))
+                    counter += 1
+    print("Found {} matches".format(counter))
+    write_shifts(out_path, final_matches)
 
-    with open("{}/imshift/shifts.cl".format(directory), 'w') as w:
-        for m in final_matches:
-            cmd = "imshift {}/{} {}/shifted_{} {} {}\n".format(pics_path, m[1][:-6], pics_path, m[1][:-6], m[2], m[3])
+
+def write_shifts(out_path, shifts):
+    print("Writing shifts.cl file to current directory...")
+    with open("shifts.cl", 'w') as w:
+        for m in shifts:
+            cmd = "imshift {}/{} {}/{} {} {}\n".format(pics_path, m[1][:-6], out_path, m[1][:-6], m[2], m[3])
             w.write(cmd)
+    print("Run \'cl < shifts.cl\' in IRAF to apply shifts")
 
+def get_ra_dec(file_name, with_s, with_labels):
+    if with_s:
+        ra_re = re.search('.{2}h.{2}m.{4}s', file_name)
+        ra = re.sub('\..s', 's', ra_re.group(0))
+        dec = re.search('.{2}d.{2}m.{2}s', file_name).group(0)
+    else:
+        ra_re = re.search('.{2}h.{2}m', file_name)
+        ra = re.sub('\..s', 's', ra_re.group(0))
+        dec = re.search('.{2}d.{2}m', file_name).group(0)
 
-
-def get_ra_dec(file_name):
-    ra_re = re.search('.{2}h.{2}m', file_name)
-    ra = re.sub('\..s', 's', ra_re.group(0))
-    dec = re.search('.{2}d.{2}m', file_name).group(0)
+    if not with_labels:
+        ra = ra.replace("h", " ").replace("m", " ").replace("s", "")
+        dec = dec.replace("d", " ").replace("m", " ").replace("s", "")
     return ra, dec
 
 
@@ -105,5 +144,7 @@ ref_prefix = "R"
 main_path = "/Users/research/Desktop/PROJECT/IMAGES"
 centers_path = "{}/imshift/centers".format(main_path)
 pics_path = "{}/final_science".format(main_path)
+out_path = "{}/all_coords".format(main_path)
+shift_all = False
 
-find_matching_pointings(centers_path, pics_path, ref_prefix)
+find_matching_pointings(centers_path, pics_path, out_path, ref_prefix, shift_all)
